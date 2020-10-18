@@ -5,9 +5,42 @@ require 'sinatra/json'
 require 'D:\UTM\2020\PAD\lab1\model\coffee.rb'
 require 'json'
 require 'D:\UTM\2020\PAD\lab1\jobs\deliver.rb'
+require 'rest-client'
+require 'securerandom'
 
+
+set :port, 8000
 
 Mongoid.load!(File.join(File.dirname(__FILE__), 'config', 'mongoid.yml'))
+
+GATEWAY_ADRESS = "http://127.0.0.1:8500/v1/agent/service/"
+
+service_id = SecureRandom.hex
+
+begin
+at_exit do
+  RestClient::Request.execute(
+  method: :put,
+  url: GATEWAY_ADRESS + "deregister/" + service_id)
+end
+rescue
+  puts "handle"
+ensure
+  puts "bye"
+end
+
+begin
+RestClient::Request.execute(
+  method: :post,
+  url: GATEWAY_ADRESS + "register?replace-existing-checks=true",
+  payload: {"ID": service_id, "Name": "pad-orders-service","Address": "127.0.0.1","Port": 8000}.to_json
+)
+rescue
+  puts "handle it"
+ensure 
+  puts "bye"
+end
+
 
 LIMIT = 8 #task limit
 

@@ -11,8 +11,17 @@ GEM
       zeitwerk (~> 2.2, >= 2.2.2)
     bson (4.10.1)
     concurrent-ruby (1.1.7)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
+    ffi (1.13.1-x64-mingw32)
+    http-accept (1.7.0)
+    http-cookie (1.0.3)
+      domain_name (~> 0.5)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
+    mime-types (3.3.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2020.0512)
     minitest (5.14.2)
     mongo (2.13.1)
       bson (>= 4.8.2, < 5.0.0)
@@ -21,9 +30,16 @@ GEM
       mongo (>= 2.7.0, < 3.0.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
+    netrc (0.11.0)
     rack (2.2.3)
     rack-protection (2.1.0)
       rack
+    rest-client (2.1.0-x64-mingw32)
+      ffi (~> 1.9)
+      http-accept (>= 1.7.0, < 2.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 4.0)
+      netrc (~> 0.8)
     ruby2_keywords (0.0.2)
     sinatra (2.1.0)
       mustermann (~> 1.0)
@@ -36,6 +52,9 @@ GEM
     tilt (2.0.10)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.7-x64-mingw32)
     zeitwerk (2.4.0)
 
 PLATFORMS
@@ -43,6 +62,7 @@ PLATFORMS
 
 DEPENDENCIES
   mongoid (~> 7.0)
+  rest-client (~> 2.1)
   sinatra (~> 2.0)
   sucker_punch
 
