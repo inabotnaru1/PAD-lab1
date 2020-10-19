@@ -32,9 +32,9 @@ end
 
 begin
 RestClient::Request.execute(
-  method: :post,
+  method: :put,
   url: GATEWAY_ADRESS + "register?replace-existing-checks=true",
-  payload: {"ID": SERVICE_ID, "Name": "pad-orders-service","Address": "127.0.0.1","Port": 8000}.to_json
+  payload: {"ID": SERVICE_ID, "Name": "orders-service","Address": "orders-service","Port": 8000}.to_json
 )
 rescue
   puts "handle it"
@@ -46,7 +46,7 @@ end
 LIMIT = 8 #task limit
 
   get '/' do
-    respone =  RestClient.put GATEWAY_ADRESS + "register?replace-existing-checks=true", {"ID": SERVICE_ID, "Name": "pad-orders-service","Address": "127.0.0.1","Port": 8000}.to_json
+    respone =  RestClient.put GATEWAY_ADRESS + "register?replace-existing-checks=true", {"ID": SERVICE_ID, "Name": "orders-service","Address": "orders-service","Port": 8000}.to_json
     json(respone)
   end
 
