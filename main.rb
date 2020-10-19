@@ -1,6 +1,6 @@
 require 'sucker_punch'
 require 'sinatra'
-require 'mongoid'
+# require 'mongoid'
 require 'sinatra/json'
 # require_relative 'model\coffee.rb'
 require 'json'
@@ -10,7 +10,7 @@ require 'securerandom'
 require 'mongoid'
 
 
-set :port, 8000
+ set :port, 8000
 
 Mongoid.load!(File.join(File.dirname(__FILE__), 'config', 'mongoid.yml'))
 
@@ -18,29 +18,29 @@ GATEWAY_ADRESS = "http://consul:8500/v1/agent/service/"
 
 SERVICE_ID = SecureRandom.hex
 
-begin
-at_exit do
-  RestClient::Request.execute(
-  method: :put,
-  url: GATEWAY_ADRESS + "deregister/" + SERVICE_ID)
-end
-rescue
-  puts "handle"
-ensure
-  puts "bye"
-end
+# begin
+# at_exit do
+#   RestClient::Request.execute(
+#   method: :put,
+#   url: GATEWAY_ADRESS + "deregister/" + SERVICE_ID)
+# end
+# rescue
+#   puts "handle"
+# ensure
+#   puts "bye"
+# end
 
-begin
-RestClient::Request.execute(
-  method: :put,
-  url: GATEWAY_ADRESS + "register?replace-existing-checks=true",
-  payload: {"ID": SERVICE_ID, "Name": "orders-service","Address": "orders-service","Port": 8000}.to_json
-)
-rescue
-  puts "handle it"
-ensure 
-  puts "bye"
-end
+# begin
+# RestClient::Request.execute(
+#   method: :put,
+#   url: GATEWAY_ADRESS + "register?replace-existing-checks=true",
+#   payload: {"ID": SERVICE_ID, "Name": "orders-service","Address": "orders-service","Port": 8000}.to_json
+# )
+# rescue
+#   puts "handle it"
+# ensure 
+#   puts "bye"
+# end
 
 
 LIMIT = 8 #task limit
@@ -123,7 +123,6 @@ LIMIT = 8 #task limit
     field :status, type: String
 
   end
-
   
  
 

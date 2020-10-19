@@ -1,5 +1,10 @@
 version: '3.8'
 services: 
     orders-service:
-        image: inabotnaru/pad-orders-service
-        command: 'ruby main.rb'
+        build: .
+        container_name: pad-orders-service
+        ports: ['8000:8000']
+        environment:
+            - IP=orders-service
+            - PORT=8000
+        command: sh -c "ruby main.rb"
