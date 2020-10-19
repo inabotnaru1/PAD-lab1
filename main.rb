@@ -2,26 +2,27 @@ require 'sucker_punch'
 require 'sinatra'
 require 'mongoid'
 require 'sinatra/json'
-require 'D:\UTM\2020\PAD\lab1\model\coffee.rb'
+# require_relative 'model\coffee.rb'
 require 'json'
-require 'D:\UTM\2020\PAD\lab1\jobs\deliver.rb'
+# require_relative 'jobs\deliver.rb'
 require 'rest-client'
 require 'securerandom'
+require 'mongoid'
 
 
 set :port, 8000
 
 Mongoid.load!(File.join(File.dirname(__FILE__), 'config', 'mongoid.yml'))
 
-GATEWAY_ADRESS = "http://127.0.0.1:8500/v1/agent/service/"
+GATEWAY_ADRESS = "http://consul:8500/v1/agent/service/"
 
-service_id = SecureRandom.hex
+SERVICE_ID = SecureRandom.hex
 
 begin
 at_exit do
   RestClient::Request.execute(
   method: :put,
-  url: GATEWAY_ADRESS + "deregister/" + service_id)
+  url: GATEWAY_ADRESS + "deregister/" + SERVICE_ID)
 end
 rescue
   puts "handle"
@@ -33,7 +34,7 @@ begin
 RestClient::Request.execute(
   method: :post,
   url: GATEWAY_ADRESS + "register?replace-existing-checks=true",
-  payload: {"ID": service_id, "Name": "pad-orders-service","Address": "127.0.0.1","Port": 8000}.to_json
+  payload: {"ID": SERVICE_ID, "Name": "pad-orders-service","Address": "127.0.0.1","Port": 8000}.to_json
 )
 rescue
   puts "handle it"
@@ -43,6 +44,11 @@ end
 
 
 LIMIT = 8 #task limit
+
+  get '/' do
+    respone =  RestClient.put GATEWAY_ADRESS + "register?replace-existing-checks=true", {"ID": SERVICE_ID, "Name": "pad-orders-service","Address": "127.0.0.1","Port": 8000}.to_json
+    json(respone)
+  end
 
   get '/orders' do
     Coffee.all.to_json
@@ -96,6 +102,27 @@ LIMIT = 8 #task limit
   end
 
 
+  class Deliver
+    include SuckerPunch::Job
+    workers 10
+  
+    def perform(params)
+        order = Coffee.find(params[:id])
+        puts order.status
+        order.status = "done"
+        order.save
+    end
+  end
+
+  class Coffee
+    include Mongoid::Document
+
+    field :vegan, type: Boolean
+    field :type, type: String 
+    field :sugar_cubes, type: Integer
+    field :status, type: String
+
+  end
 
   
  

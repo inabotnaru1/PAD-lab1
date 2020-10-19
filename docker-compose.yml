@@ -1,0 +1,5 @@
+version: '3.8'
+services: 
+    orders-service:
+        image: inabotnaru/pad-orders-service
+        command: 'ruby main.rb'
