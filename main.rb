@@ -9,8 +9,8 @@ require 'rest-client'
 require 'securerandom'
 require 'mongoid'
 
-
- set :port, 8000
+set :bind, '0.0.0.0'
+set :port, 8000
 
 Mongoid.load!(File.join(File.dirname(__FILE__), 'config', 'mongoid.yml'))
 
@@ -18,32 +18,26 @@ GATEWAY_ADRESS = "http://consul:8500/v1/agent/service/"
 
 SERVICE_ID = SecureRandom.hex
 
-# begin
-# at_exit do
-#   RestClient::Request.execute(
-#   method: :put,
-#   url: GATEWAY_ADRESS + "deregister/" + SERVICE_ID)
-# end
-# rescue
-#   puts "handle"
-# ensure
-#   puts "bye"
-# end
+TASK_LIMIT = 8 
 
-# begin
-# RestClient::Request.execute(
-#   method: :put,
-#   url: GATEWAY_ADRESS + "register?replace-existing-checks=true",
-#   payload: {"ID": SERVICE_ID, "Name": "orders-service","Address": "orders-service","Port": 8000}.to_json
-# )
-# rescue
-#   puts "handle it"
-# ensure 
-#   puts "bye"
-# end
+begin
+at_exit do
+  RestClient.put GATEWAY_ADRESS + "deregister/" + SERVICE_ID, {}.to_json
+end
+rescue
+  puts "Error when exit"
+ensure
+  puts " "
+end
 
+begin
+RestClient.put GATEWAY_ADRESS + "register?replace-existing-checks=true", {"ID": SERVICE_ID, "Name": "orders-service","Address": "orders-service","Port": 8000}.to_json
+rescue
+  puts "Connection to the gateway failed"
+ensure 
+  puts " "
+end
 
-LIMIT = 8 #task limit
 
   get '/' do
     respone =  RestClient.put GATEWAY_ADRESS + "register?replace-existing-checks=true", {"ID": SERVICE_ID, "Name": "orders-service","Address": "orders-service","Port": 8000}.to_json
@@ -63,10 +57,11 @@ LIMIT = 8 #task limit
   post '/orders' do #create a new order based on request, if the task limit isn't reached
     if !can_create_order 
       halt 400, json({error:"Task limit reached"})
-    end
+    else
     body = JSON.parse(request.body.read)
     coffee_order = Coffee.create(vegan:body["vegan"], type:body["type"], sugar_cubes:body["sugar_cubes"], status:"ordered")
     json(coffee_order)
+    end
   end
 
   put '/orders/:id' do #the order is started and based on coffee type the time for preparation is calculated
@@ -98,7 +93,7 @@ LIMIT = 8 #task limit
 
   def can_create_order
     count = Coffee.all.to_a.count{|order|["ordered","starting"].include?(order.status)}
-    count < LIMIT
+    count < TASK_LIMIT
   end
 
 
